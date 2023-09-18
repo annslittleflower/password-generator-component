@@ -1,3 +1,5 @@
 .rangeInput {
-  width: 300px;
+  cursor: pointer;
+  width: 100%;
+  margin: 0;
 }
