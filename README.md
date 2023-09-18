@@ -14,4 +14,4 @@
 
 ## Live version
 
-http://localhost:3333/
+[https://annslittleflower.github.io/password-generator-component/](https://annslittleflower.github.io/password-generator-component/)
