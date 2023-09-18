@@ -1,25 +1,26 @@
-import { ComponentPropsWithoutRef, useState } from 'react'
+import { ComponentPropsWithoutRef } from 'react'
 
 import styles from './CopyInput.module.css'
 
 import imgUrl from '/images/copyIcon.svg'
 
-type CopyInputProps = ComponentPropsWithoutRef<'input'>
+type CopyInputProps = ComponentPropsWithoutRef<'input'> & {
+  value: string
+}
 
-const CopyInput = (props: CopyInputProps) => {
-  const [inputValue, setInputValue] = useState('')
-
+const CopyInput = ({ value, onChange = () => {}, ...rest }: CopyInputProps) => {
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(inputValue)
+    if (!value) return null
+    navigator.clipboard.writeText(value)
   }
 
   return (
     <div className={styles.inputWrapper}>
       <input
-        {...props}
         className={styles.copyInput}
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
+        value={value}
+        onChange={onChange}
+        {...rest}
       />
       <img
         src={imgUrl}
