@@ -17,7 +17,6 @@ const RangeInput = ({
       className={styles.rangeInput}
       onChange={(e) => onValueChange(+e.target.value)}
       min={min}
-      // max={max}
       {...rest}
     />
   )
