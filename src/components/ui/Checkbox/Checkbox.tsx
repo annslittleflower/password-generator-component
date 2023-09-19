@@ -5,7 +5,7 @@ import styles from './Checkbox.module.css'
 type CheckboxProps = ComponentPropsWithoutRef<'input'> & {
   label: string
   name: string
-  onValueChange: (name: string, value: boolean) => void
+  onValueChange(name: string, value: boolean): void
 }
 
 const Checkbox = ({

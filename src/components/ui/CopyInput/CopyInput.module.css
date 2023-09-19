@@ -27,3 +27,11 @@
   top: 1.2rem;
 }
 
+.copyIcon:hover {
+  box-shadow: 0px 0px 10px 2px rgb(43 106 171 / 50%);
+}
+
+
+.copyIcon:active {
+  box-shadow: 0px 0px 10px 2px rgb(0 55 255 / 30%);
+}

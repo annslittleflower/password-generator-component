@@ -1,10 +1,13 @@
-import { useReducer, useState } from 'react'
+import { useState } from 'react'
 
 import CopyInput from '@/components/ui/CopyInput'
 import RangeInput from '@/components/ui/RangeInput'
 import Checkbox from '@/components/ui/Checkbox'
+import Button from '@/components/ui/Button'
 
 import styles from './PasswordGenerator.module.css'
+
+import { shuffleString } from './utils'
 
 const CHARACTERS_MAP = {
   lowercase: 'abcdefghijklmnopqrstuvwxyz',
@@ -13,25 +16,55 @@ const CHARACTERS_MAP = {
   symbols: '!@#$%^&*()_+-=:;><',
 }
 
-const PasswordGenerator = () => {
-  const [password, setPassword] = useState('awdawd')
+const DEFAULT_CHECKBOXES_STATE = {
+  lowercase: true,
+  uppercase: false,
+  numbers: false,
+  symbols: false,
+} as const
 
-  const [lowercaseChecked, setLowercaseChecked] = useState(true)
-  const [uppercaseChecked, setUppercaseChecked] = useState(true)
-  const [numbersChecked, setNumbersChecked] = useState(true)
-  const [symbolsChecked, setSymbolsChecked] = useState(true)
+type CheckboxKeys = keyof typeof DEFAULT_CHECKBOXES_STATE
+
+const PasswordGenerator = () => {
+  const [password, setPassword] = useState('')
+
+  const [checkboxesState, setCheckboxesState] = useState(
+    DEFAULT_CHECKBOXES_STATE
+  )
 
   const [charactersLength, setCharactersLength] = useState(20)
 
-  const changeLowercase = (n: string, v: boolean) => setLowercaseChecked(v)
-  const changeUppercase = (n: string, v: boolean) => setUppercaseChecked(v)
-  const changeNumbers = (n: string, v: boolean) => setNumbersChecked(v)
-  const changeSymbols = (n: string, v: boolean) => setSymbolsChecked(v)
+  const changeCheckboxesState = (c: CheckboxKeys, v: boolean) => {
+    const newCheckboxesState = Object.assign({}, checkboxesState, { [c]: v })
+    setCheckboxesState(newCheckboxesState)
+  }
 
   const generatePassword = () => {
-    const p = CHARACTERS_MAP.lowercase
-    setPassword(p)
+    const checkedCount = Object.values(checkboxesState).filter(
+      (v) => !!v
+    ).length
+
+    const eachCharacterSetLength = Math.ceil(charactersLength / checkedCount)
+
+    const resultString = Object.keys(checkboxesState).reduce((acc, k) => {
+      if (checkboxesState[k as CheckboxKeys]) {
+        const characters = CHARACTERS_MAP[k as CheckboxKeys]
+        const res = Array.from(
+          { length: eachCharacterSetLength },
+          () => characters[Math.floor(Math.random() * characters.length)]
+        )
+        acc += res.join('')
+      }
+
+      return acc.length > charactersLength
+        ? acc.slice(0, charactersLength)
+        : acc
+    }, '')
+
+    setPassword(shuffleString(resultString))
   }
+
+  const checkboxError = !Object.values(checkboxesState).some((v) => v)
 
   return (
     <div className={styles.passwordGenerator}>
@@ -41,36 +74,46 @@ const PasswordGenerator = () => {
       />
       <p className={styles.charLength}>Characters length {charactersLength}</p>
       <RangeInput
-        // interesting react bug with initial render of range input, defaultValue fixes it
-        defaultValue={charactersLength}
+        value={charactersLength}
         onValueChange={setCharactersLength}
       />
       <div className={styles.checkboxes}>
         <Checkbox
-          name='lowercaseChecked'
-          checked={lowercaseChecked}
+          name='lowercase'
+          checked={checkboxesState.lowercase}
           label='Include Lowercase'
-          onValueChange={changeLowercase}
+          onValueChange={changeCheckboxesState}
         />
         <Checkbox
-          name='uppercaseChecked'
-          checked={uppercaseChecked}
+          name='uppercase'
+          checked={checkboxesState.uppercase}
           label='Include Uppercase'
-          onValueChange={changeUppercase}
+          onValueChange={changeCheckboxesState}
         />
         <Checkbox
-          name='numbersChecked'
-          checked={numbersChecked}
+          name='numbers'
+          checked={checkboxesState.numbers}
           label='Include Numbers'
-          onValueChange={changeNumbers}
+          onValueChange={changeCheckboxesState}
         />
         <Checkbox
-          name='symbolsChecked'
-          checked={symbolsChecked}
+          name='symbols'
+          checked={checkboxesState.symbols}
           label='Include Symbols'
-          onValueChange={changeSymbols}
+          onValueChange={changeCheckboxesState}
         />
       </div>
+      {checkboxError ? (
+        <p className={styles.checkboxError}>
+          * Please select at least one checkbox
+        </p>
+      ) : null}
+      <Button
+        onClick={generatePassword}
+        disabled={checkboxError}
+      >
+        Generate
+      </Button>
     </div>
   )
 }
