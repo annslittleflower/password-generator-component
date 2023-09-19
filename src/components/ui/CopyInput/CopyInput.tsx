@@ -22,12 +22,14 @@ const CopyInput = ({ value, onChange = () => {}, ...rest }: CopyInputProps) => {
         onChange={onChange}
         {...rest}
       />
-      <img
-        src={imgUrl}
-        className={styles.copyIcon}
-        onClick={copyToClipboard}
-        title='copy'
-      />
+      {value ? (
+        <img
+          src={imgUrl}
+          className={styles.copyIcon}
+          onClick={copyToClipboard}
+          title='copy'
+        />
+      ) : null}
     </div>
   )
 }
